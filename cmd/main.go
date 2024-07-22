@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
+	"time-tracker/internal/app"
 	"time-tracker/internal/config"
 )
 
@@ -18,13 +18,12 @@ func main() {
 		panic("time-tracker: failed to read config: " + err.Error())
 	}
 
-	fmt.Print(cfg)
-
 	log := setupLogger(cfg.Env)
 
-	fmt.Print(log)
+	log.Info("starting time-tracker")
 
-	// TODO:запуск сервера
+	application := app.New(log, cfg.HTTPcfg.HTTPServer, cfg.HTTPcfg.HTTPPort)
+	application.HTTPSrv.MustRun()
 
 	// TODO: безопасное окончание программы
 }
