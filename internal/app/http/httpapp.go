@@ -1,6 +1,7 @@
 package httpapp
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 type App struct {
 	log  *slog.Logger
 	addr string
+	srv  *http.Server
 }
 
 func New(
@@ -16,14 +18,23 @@ func New(
 	server string,
 	port string,
 ) *App {
+	r := http.NewServeMux()
+	RegisterRoutes(r)
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf("%s:%s", server, port),
+		Handler: r,
+	}
+
 	return &App{
 		log:  log,
-		addr: fmt.Sprintf("%s:%s", server, port),
+		addr: srv.Addr,
+		srv:  srv,
 	}
 }
 
 func (a *App) MustRun() {
-	if err := a.Run(); err != nil {
+	if err := a.Run(); err != nil && err != http.ErrServerClosed {
 		panic(err)
 	}
 }
@@ -33,18 +44,16 @@ func (a *App) Run() error {
 
 	log := a.log.With(slog.String("op", op))
 
-	r := http.NewServeMux()
-	a.RegisterRoutes(r)
-
-	srv := &http.Server{
-		Addr:    a.addr,
-		Handler: r,
-	}
-
 	log.Info("http server is running")
 
-	if err := srv.ListenAndServe(); err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
-	return nil
+	return a.srv.ListenAndServe()
+
+}
+
+func (a *App) Stop(ctx context.Context) {
+	const op = "httpapp.Stop"
+
+	a.log.With(slog.String("op", op)).Info("stopping http server")
+
+	a.srv.Shutdown(ctx)
 }

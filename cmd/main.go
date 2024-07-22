@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	"time-tracker/internal/app"
 	"time-tracker/internal/config"
 )
@@ -23,9 +27,20 @@ func main() {
 	log.Info("starting time-tracker")
 
 	application := app.New(log, cfg.HTTPcfg.HTTPServer, cfg.HTTPcfg.HTTPPort)
-	application.HTTPSrv.MustRun()
 
-	// TODO: безопасное окончание программы
+	go func() {
+		application.HTTPSrv.MustRun()
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	sign := <-stop
+	log.Info("shutting down time-tracker service", slog.String("signal", sign.String()))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	application.HTTPSrv.Stop(ctx)
+	log.Info("time-tracker service stopped")
 }
 
 func setupLogger(env string) *slog.Logger {
