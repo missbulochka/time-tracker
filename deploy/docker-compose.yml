@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+    dev_time-tracker:
+      image: time-tracker:1.0
+      container_name: time-tracker
+      ports:
+        - "0.0.0.0:8080:8080"
+      depends_on:
+        time-tracker-psql:
+          condition: service_healthy
+      env_file:
+        - ../timetracker.env
+      restart: unless-stopped
+
+
+    time-tracker-psql:
+      image: "postgres:16.2"
+      container_name: time-tracker-psql
+      ports:
+        - "0.0.0.0:5432:5432"
+      env_file:
+        - ../psql.env
+      healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" ]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+      restart: unless-stopped

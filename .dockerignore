@@ -1,0 +1,9 @@
+.dockerignore
+.gitignore
+Makefile
+README.md
+*.pdf
+.editorconfig
+docker/
+.devcontainer/
+pkg/mod/*
