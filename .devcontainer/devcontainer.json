@@ -1,0 +1,17 @@
+{
+    "name": "dev_time-tracker",
+    "dockerComposeFile": [
+      "docker-compose.yml"
+    ],
+    "service": "dev_time-tracker",
+    "runServices": [
+      "time-tracker-psql"
+    ],
+    "forwardPorts": [
+      8080
+    ],
+    "remoteUser": "builder",
+    "updateRemoteUserUID": false,
+    "workspaceFolder": "/go",
+    "shutdownAction": "stopCompose"
+}
