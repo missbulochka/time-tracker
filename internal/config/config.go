@@ -3,13 +3,13 @@ package config
 import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-	Env     string `env:"TTRACKER_ENV, default=local"`
+	Env     string `envconfig:"TTRACKER_ENV" default:"dev"`
 	HTTPcfg HTTPConfig
 }
 
 type HTTPConfig struct {
-	HTTPServer string `env:"TTRACKER_HTTP_SERVER, default=0.0.0.0"`
-	HTTPPort   string `env:"TTRACKER_HTTP_PORT, default=8080"`
+	HTTPServer string `envconfig:"TTRACKER_HTTP_SERVER" default:"0.0.0.0"`
+	HTTPPort   string `envconfig:"TTRACKER_HTTP_PORT" default:"8080"`
 }
 
 func LoadCfg() (*Config, error) {
