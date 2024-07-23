@@ -25,8 +25,12 @@ func main() {
 	log := setupLogger(cfg.Env)
 
 	log.Info("starting time-tracker")
+	log.Debug("with config",
+		slog.String("env", cfg.Env),
+		slog.String("addr", cfg.HTTPcfg.HTTPServer+":"+cfg.HTTPcfg.HTTPPort),
+	)
 
-	application := app.New(log, cfg.HTTPcfg.HTTPServer, cfg.HTTPcfg.HTTPPort)
+	application := app.New(log, cfg)
 
 	go func() {
 		application.HTTPSrv.MustRun()
@@ -38,6 +42,7 @@ func main() {
 	sign := <-stop
 	log.Info("shutting down time-tracker service", slog.String("signal", sign.String()))
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+
 	defer cancel()
 	application.HTTPSrv.Stop(ctx)
 	log.Info("time-tracker service stopped")
@@ -53,7 +58,7 @@ func setupLogger(env string) *slog.Logger {
 		)
 	case envProd:
 		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
 		)
 	}
 
