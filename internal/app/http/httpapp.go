@@ -41,7 +41,6 @@ func (a *App) MustRun() {
 
 func (a *App) Run() error {
 	const op = "httpapp.Start"
-
 	log := a.log.With(slog.String("op", op))
 
 	log.Info("http server is running")
@@ -52,7 +51,6 @@ func (a *App) Run() error {
 
 func (a *App) Stop(ctx context.Context) {
 	const op = "httpapp.Stop"
-
 	a.log.With(slog.String("op", op)).Info("stopping http server")
 
 	a.srv.Shutdown(ctx)
