@@ -14,11 +14,11 @@ type Storage struct {
 	db  *sql.DB
 }
 
-func New(log *slog.Logger, storageSetup string) (*Storage, error) {
-	const op = "storage.postgres.New"
+func New(log *slog.Logger, databaseURL string) (*Storage, error) {
+	const op = "postgres.New"
 	log.With(slog.String("op", op))
 
-	db, err := sql.Open("postgres", storageSetup)
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		log.Error("failed to init storage", sl.Err(err))
 		return nil, fmt.Errorf("%s: %w", op, err)

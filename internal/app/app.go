@@ -17,25 +17,27 @@ func New(
 	log *slog.Logger,
 	cfg *config.Config,
 ) *App {
+	psqlDatabaseURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.PSQLcfg.UserName,
+		cfg.PSQLcfg.Password,
+		cfg.PSQLcfg.Host,
+		cfg.PSQLcfg.Port,
+		cfg.PSQLcfg.DBName,
+	)
+
+	if err := postgres.RunMigrate(log, "file://"+cfg.MigrationPATH, psqlDatabaseURL); err != nil {
+		panic(err)
+	}
+	psqlStorage, err := postgres.New(log, psqlDatabaseURL)
+	if err != nil {
+		panic(err)
+	}
+
 	httpapp := httpapp.New(
 		log,
 		cfg.HTTPcfg.HTTPServer,
 		cfg.HTTPcfg.HTTPPort,
 	)
-
-	psqlStorage, err := postgres.New(
-		log,
-		fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			cfg.PSQLcfg.Host,
-			cfg.PSQLcfg.Port,
-			cfg.PSQLcfg.UserName,
-			cfg.PSQLcfg.Password,
-			cfg.PSQLcfg.DBName,
-		),
-	)
-	if err != nil {
-		panic(err)
-	}
 
 	// TODO: remove it
 	fmt.Println(psqlStorage)

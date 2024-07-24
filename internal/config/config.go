@@ -3,9 +3,10 @@ package config
 import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-	Env     string `envconfig:"TTRACKER_ENV" default:"dev"`
-	HTTPcfg HTTPConfig
-	PSQLcfg PSQLConfig
+	Env           string `envconfig:"TTRACKER_ENV" default:"dev"`
+	MigrationPATH string `envconfig:"TTRACKER_MIGRATIONS_PATH" default:"./migrations"`
+	HTTPcfg       HTTPConfig
+	PSQLcfg       PSQLConfig
 }
 
 type HTTPConfig struct {
