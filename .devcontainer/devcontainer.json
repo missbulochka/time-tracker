@@ -12,6 +12,6 @@
     ],
     "remoteUser": "builder",
     "updateRemoteUserUID": false,
-    "workspaceFolder": "/go",
+    "workspaceFolder": "/usr/src/timetracker",
     "shutdownAction": "stopCompose"
 }

@@ -25,7 +25,7 @@ up-dev: build-base
 
 # You can run your app with devcontainer
 run-dev: up-dev
-	devcontainer exec --workspace-folder . go run /go/cmd/main.go
+	devcontainer exec --workspace-folder . go run /usr/src/timetracker/cmd/main.go
 
 # You can down dev-container with
 down-dev:

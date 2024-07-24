@@ -1,6 +1,6 @@
 FROM golang:1.22.4
 
-WORKDIR /go
+WORKDIR /usr/src/timetracker
 
 RUN apt-get update -y && apt-get upgrade -y \
     	&& apt-get clean \
@@ -19,6 +19,6 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} \
 
 USER ${USERNAME}:${USERNAME}
 
-COPY go.mod .
+COPY go.mod go.sum ./
 
-RUN go mod download
+RUN go mod download && go mod verify
