@@ -1,0 +1,38 @@
+CREATE TABLE IF NOT EXISTS users
+(
+	user_id bigint GENERATED ALWAYS AS IDENTITY,
+	passport_number VARCHAR(11) NOT NULL,
+	surname VARCHAR(20),
+	name VARCHAR(25),
+	patronymic VARCHAR(20),
+	adress VARCHAR(128),
+	created_at TIMESTAMP(4) NOT NULL DEFAULT LOCALTIMESTAMP,
+	updated_at TIMESTAMP(4) NOT NULL DEFAULT LOCALTIMESTAMP,
+	CONSTRAINT users_pk PRIMARY KEY (user_id)
+);
+
+CREATE UNIQUE INDEX passport ON users (passport_number);
+
+CREATE TABLE IF NOT EXISTS user_tasks
+(
+	user_id bigint NOT NULL,
+	task_id bigint NOT NULL,
+	start_time TIMESTAMP(2) NOT NULL DEFAULT LOCALTIMESTAMP,
+	end_time TIMESTAMP(2),
+	duration INTERVAL(2) GENERATED ALWAYS AS (end_time - start_time) STORED,
+	created_at TIMESTAMP(4) NOT NULL DEFAULT LOCALTIMESTAMP,
+	updated_at TIMESTAMP(4) NOT NULL DEFAULT LOCALTIMESTAMP,
+	CONSTRAINT users_tasks_pk PRIMARY KEY (user_id, task_id)
+);
+
+CREATE TABLE IF NOT EXISTS tasks
+(
+	task_id bigint GENERATED ALWAYS AS IDENTITY,
+	task_name VARCHAR(100) UNIQUE,
+	created_at TIMESTAMP(4) NOT NULL DEFAULT LOCALTIMESTAMP,
+	updated_at TIMESTAMP(4) NOT NULL DEFAULT LOCALTIMESTAMP,
+	CONSTRAINT tasks_pk PRIMARY KEY(task_id)
+);
+
+ALTER TABLE user_tasks ADD FOREIGN KEY (user_id) REFERENCES users (user_id);
+ALTER TABLE user_tasks ADD FOREIGN KEY (task_id) REFERENCES tasks (task_id);
