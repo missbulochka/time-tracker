@@ -3,9 +3,9 @@ package app
 import (
 	"fmt"
 	"log/slog"
+	"time-tracker/internal/adapter/storage/postgres"
 	httpapp "time-tracker/internal/app/http"
 	"time-tracker/internal/config"
-	"time-tracker/internal/storage/postgres"
 )
 
 type App struct {
