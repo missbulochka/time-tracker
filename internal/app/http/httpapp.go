@@ -18,12 +18,11 @@ func New(
 	server string,
 	port string,
 ) *App {
-	r := http.NewServeMux()
-	RegisterRoutes(r)
+	router := SetupRoute()
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", server, port),
-		Handler: r,
+		Handler: router,
 	}
 
 	return &App{

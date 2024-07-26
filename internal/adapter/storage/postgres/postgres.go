@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
@@ -10,8 +11,7 @@ import (
 )
 
 type Storage struct {
-	log *slog.Logger
-	db  *sql.DB
+	db *sql.DB
 }
 
 func New(log *slog.Logger, databaseURL string) (*Storage, error) {
@@ -27,7 +27,16 @@ func New(log *slog.Logger, databaseURL string) (*Storage, error) {
 	log.Debug("successfully connected to psql")
 
 	return &Storage{
-		log: log,
-		db:  db,
+		db: db,
 	}, nil
+}
+
+func (s *Storage) DeleteUser(ctx context.Context, UID string) error {
+	row := s.db.QueryRowContext(
+		ctx,
+		"DELTE FROM users WHERE user_id=?",
+		UID,
+	)
+
+	return row.Err()
 }
