@@ -11,7 +11,7 @@ type UserSaver interface {
 }
 
 type UserDeleter interface {
-	DeleteUser(context.Context, string) error
+	DeleteUser(context.Context, uint32) error
 }
 
 type UserManager struct {

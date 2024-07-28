@@ -16,3 +16,9 @@ func Error(msg string) Response {
 		Error:  msg,
 	}
 }
+
+func OK() Response {
+	return Response{
+		Status: StatusOK,
+	}
+}

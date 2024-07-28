@@ -6,7 +6,7 @@ import (
 	"time-tracker/internal/lib/logger/sl"
 )
 
-func (um *UserManager) DeleteUser(ctx context.Context, UID string) error {
+func (um *UserManager) DeleteUser(ctx context.Context, UID uint32) error {
 	const op = "usermanager.DeleteUser"
 	um.log.With(slog.String("op", op))
 

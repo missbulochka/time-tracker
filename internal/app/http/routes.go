@@ -1,11 +1,15 @@
 package httpapp
 
 import (
+	"log/slog"
+	userv1 "time-tracker/internal/handler/http/api/v1/user"
+	"time-tracker/internal/usecase"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
 
-func SetupRoute() *chi.Mux {
+func SetupRoute(log *slog.Logger, useCase *usecase.UseCase) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(middleware.RequestID)
@@ -14,15 +18,11 @@ func SetupRoute() *chi.Mux {
 	// cannot be used by the std
 	router.Use(middleware.URLFormat)
 
-	RegisterRoutes(router)
+	RegisterRoutes(log, router, useCase)
 
 	return router
 }
 
-func RegisterRoutes(r *chi.Mux) {
-	// TODO:получение данных пользователей
-
-	// TODO:получение трудозатрат по пользователю за период
-
-	// Начало отчета
+func RegisterRoutes(log *slog.Logger, r *chi.Mux, useCase *usecase.UseCase) {
+	r.Delete("/users/del/", userv1.New(log, useCase))
 }

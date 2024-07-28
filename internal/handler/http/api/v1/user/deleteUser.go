@@ -6,15 +6,19 @@ import (
 	"net/http"
 	"time-tracker/internal/entity"
 	"time-tracker/internal/entity/validator"
+	"time-tracker/internal/handler/http/api/v1/user/models"
 	resp "time-tracker/internal/lib/api/response"
 	"time-tracker/internal/lib/logger/sl"
+	"time-tracker/internal/lib/random"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 )
 
+const aliasLength = 6
+
 type UserDeleter interface {
-	DeleteUser(ctx context.Context, UID string) error
+	DeleteUser(context.Context, uint32) error
 }
 
 func New(log *slog.Logger, userDeleter UserDeleter) http.HandlerFunc {
@@ -40,7 +44,25 @@ func New(log *slog.Logger, userDeleter UserDeleter) http.HandlerFunc {
 			log.Error("invalid request", sl.Err(err))
 
 			render.JSON(w, r, resp.Error("failed to decode request"))
+
+			return
 		}
 
+		alias := req.Alias
+		if len(alias) == 0 {
+			alias = random.NewRandomString(aliasLength)
+		}
+
+		err := userDeleter.DeleteUser(context.Background(), req.UID)
+		if err != nil {
+			// TODO: реализация
+
+			return
+		}
+
+		render.JSON(w, r, models.Response{
+			Response: resp.OK(),
+			Alias:    alias,
+		})
 	}
 }

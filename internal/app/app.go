@@ -6,6 +6,8 @@ import (
 	"time-tracker/internal/adapter/storage/postgres"
 	httpapp "time-tracker/internal/app/http"
 	"time-tracker/internal/config"
+	usermanager "time-tracker/internal/service/userManager"
+	"time-tracker/internal/usecase"
 )
 
 type App struct {
@@ -33,14 +35,23 @@ func New(
 		panic(err)
 	}
 
+	userManagerServ := usermanager.NewService(
+		log,
+		psqlStorage,
+		psqlStorage,
+	)
+
+	appUseCase := usecase.NewUseCase(
+		log,
+		userManagerServ,
+	)
+
 	httpapp := httpapp.New(
 		log,
 		cfg.HTTPcfg.HTTPServer,
 		cfg.HTTPcfg.HTTPPort,
+		appUseCase,
 	)
-
-	// TODO: remove it
-	fmt.Println(psqlStorage)
 
 	return &App{
 		log:     log,

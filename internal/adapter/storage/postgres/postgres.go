@@ -31,10 +31,10 @@ func New(log *slog.Logger, databaseURL string) (*Storage, error) {
 	}, nil
 }
 
-func (s *Storage) DeleteUser(ctx context.Context, UID string) error {
+func (s *Storage) DeleteUser(ctx context.Context, UID uint32) error {
 	row := s.db.QueryRowContext(
 		ctx,
-		"DELTE FROM users WHERE user_id=?",
+		"DELTE FROM users WHERE user_id=$1",
 		UID,
 	)
 

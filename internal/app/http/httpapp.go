@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time-tracker/internal/usecase"
 )
 
 type App struct {
@@ -17,8 +18,9 @@ func New(
 	log *slog.Logger,
 	server string,
 	port string,
+	useCase *usecase.UseCase,
 ) *App {
-	router := SetupRoute()
+	router := SetupRoute(log, useCase)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", server, port),
