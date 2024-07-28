@@ -1,13 +1,15 @@
-package httpapp
+package http
 
 import (
 	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
-type App struct {
+type Server struct {
 	log  *slog.Logger
 	addr string
 	srv  *http.Server
@@ -17,41 +19,44 @@ func New(
 	log *slog.Logger,
 	server string,
 	port string,
-) *App {
-	r := http.NewServeMux()
-	RegisterRoutes(r)
-
-	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%s", server, port),
-		Handler: r,
-	}
-
-	return &App{
+) *Server {
+	addr := fmt.Sprintf("%s:%s", server, port)
+	return &Server{
 		log:  log,
-		addr: srv.Addr,
-		srv:  srv,
+		addr: addr,
+		srv: &http.Server{
+			Addr: addr,
+		},
 	}
 }
 
-func (a *App) MustRun() {
-	if err := a.Run(); err != nil && err != http.ErrServerClosed {
+func (s *Server) RegisterRouts(mux *chi.Mux) {
+	s.srv.Handler = mux
+}
+
+func (s *Server) MustRun() {
+	if err := s.Run(); err != nil && err != http.ErrServerClosed {
 		panic(err)
 	}
 }
 
-func (a *App) Run() error {
+func (s *Server) Run() error {
 	const op = "httpapp.Start"
-	log := a.log.With(slog.String("op", op))
+	log := s.log.With(slog.String("op", op))
+
+	if s.srv.Handler == nil {
+		log.Debug("no routes have registered")
+		return fmt.Errorf("no routes have registered")
+	}
 
 	log.Info("http server is running")
 
-	return a.srv.ListenAndServe()
-
+	return s.srv.ListenAndServe()
 }
 
-func (a *App) Stop(ctx context.Context) {
+func (s *Server) Stop(ctx context.Context) {
 	const op = "httpapp.Stop"
-	a.log.With(slog.String("op", op)).Info("stopping http server")
+	s.log.With(slog.String("op", op)).Info("stopping http server")
 
-	a.srv.Shutdown(ctx)
+	s.srv.Shutdown(ctx)
 }
