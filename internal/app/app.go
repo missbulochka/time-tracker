@@ -1,16 +1,19 @@
 package app
 
 import (
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"time-tracker/internal/adapter/storage/postgres"
-	httpapp "time-tracker/internal/app/http"
 	"time-tracker/internal/config"
+	httpapp "time-tracker/internal/handler/http"
 )
 
 type App struct {
 	log     *slog.Logger
-	HTTPSrv *httpapp.App
+	cfg     *config.Config
+	HTTPSrv *httpapp.Server
+	psqlDB  *sql.DB
 }
 
 func New(

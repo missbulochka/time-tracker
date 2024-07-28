@@ -33,7 +33,7 @@ func main() {
 	application := app.New(log, cfg)
 
 	go func() {
-		application.HTTPSrv.MustRun()
+		application.MustRunHTTPServer()
 	}()
 
 	stop := make(chan os.Signal, 1)

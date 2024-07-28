@@ -34,14 +34,8 @@ func (s *Server) RegisterRouts(mux *chi.Mux) {
 	s.srv.Handler = mux
 }
 
-func (s *Server) MustRun() {
-	if err := s.Run(); err != nil && err != http.ErrServerClosed {
-		panic(err)
-	}
-}
-
-func (s *Server) Run() error {
-	const op = "httpapp.Start"
+func (s *Server) Start() error {
+	const op = "http.Start"
 	log := s.log.With(slog.String("op", op))
 
 	if s.srv.Handler == nil {
@@ -55,7 +49,7 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) Stop(ctx context.Context) {
-	const op = "httpapp.Stop"
+	const op = "http.Stop"
 	s.log.With(slog.String("op", op)).Info("stopping http server")
 
 	s.srv.Shutdown(ctx)
