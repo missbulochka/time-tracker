@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
@@ -30,4 +31,14 @@ func New(log *slog.Logger, databaseURL string) (*Storage, error) {
 		log: log,
 		db:  db,
 	}, nil
+}
+
+func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
+	row := s.db.QueryRowContext(
+		ctx,
+		"DELETE FROM users WHERE user_id=$1",
+		uid,
+	)
+	
+	return row.Err()
 }
