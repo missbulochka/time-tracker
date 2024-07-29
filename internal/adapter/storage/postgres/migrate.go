@@ -10,23 +10,23 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func RunMigrate(log *slog.Logger, sourceURL, databaseURL string) error {
+func (s *Storage) RunMigrate(sourceURL, databaseURL string) error {
 	const op = "postgres.Migrate"
-	log.With(slog.String("op", op))
+	s.log.With(slog.String("op", op))
 
 	migration, err := migrate.New(sourceURL, databaseURL)
 
 	if err != nil {
-		log.Error("migration failed", sl.Err(err))
+		s.log.Error("migration failed", sl.Err(err))
 		return err
 	}
 
 	if err = migration.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		log.Error("migration failed", sl.Err(err))
+		s.log.Error("migration failed", sl.Err(err))
 		return err
 	}
 
-	log.Debug("migrated successfully")
+	s.log.Debug("migrated successfully")
 
 	return nil
 }

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"time-tracker/internal/adapter/storage/postgres"
@@ -10,27 +9,17 @@ import (
 )
 
 type App struct {
-	log     *slog.Logger
-	cfg     *config.Config
-	HTTPSrv *httpapp.Server
-	psqlDB  *sql.DB
+	log             *slog.Logger
+	HTTPSrv         *httpapp.Server
+	psqlDatabaseURL string
+	psqlDB          *postgres.Storage
 }
 
 func New(
 	log *slog.Logger,
 	cfg *config.Config,
 ) *App {
-	psqlDatabaseURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.PSQLcfg.UserName,
-		cfg.PSQLcfg.Password,
-		cfg.PSQLcfg.Host,
-		cfg.PSQLcfg.Port,
-		cfg.PSQLcfg.DBName,
-	)
-
-	if err := postgres.RunMigrate(log, "file://"+cfg.MigrationPATH, psqlDatabaseURL); err != nil {
-		panic(err)
-	}
+	psqlDatabaseURL := getStorageURL(cfg.PSQLcfg)
 	psqlStorage, err := postgres.New(log, psqlDatabaseURL)
 	if err != nil {
 		panic(err)
@@ -46,7 +35,9 @@ func New(
 	fmt.Println(psqlStorage)
 
 	return &App{
-		log:     log,
-		HTTPSrv: httpapp,
+		log:             log,
+		HTTPSrv:         httpapp,
+		psqlDatabaseURL: psqlDatabaseURL,
+		psqlDB:          psqlStorage,
 	}
 }

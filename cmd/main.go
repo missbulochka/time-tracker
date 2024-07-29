@@ -32,6 +32,8 @@ func main() {
 
 	application := app.New(log, cfg)
 
+	application.MustRunPSQLMigration(cfg.MigrationPATH)
+
 	go func() {
 		application.MustRunHTTPServer()
 	}()
