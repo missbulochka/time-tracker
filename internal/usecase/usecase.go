@@ -3,9 +3,11 @@ package usecase
 import (
 	"context"
 	"log/slog"
+	"time-tracker/internal/entity"
 )
 
 type UserSaver interface {
+	AddUser(context.Context, *entity.User) error
 }
 
 type UserDeleter interface {
@@ -16,6 +18,7 @@ type UserGetter interface {
 }
 
 type DataEnrichment interface {
+	GetUserInfo(context.Context, int32, int32) (*entity.UserInfo, error)
 }
 
 type TaskManager interface {
@@ -38,12 +41,12 @@ func NewUseCase(
 	dataEnrichment DataEnrichment,
 	taskManager TaskManager,
 ) *UseCase {
-    return &UseCase {
-        log: log,
-        userSaver: userSaver,
-        userDeleter: userDeleter,
-        userGetter: userGetter,
-        dataEnrichment: dataEnrichment,
-        taskManager: taskManager,
-    }
+	return &UseCase{
+		log:            log,
+		userSaver:      userSaver,
+		userDeleter:    userDeleter,
+		userGetter:     userGetter,
+		dataEnrichment: dataEnrichment,
+		taskManager:    taskManager,
+	}
 }
