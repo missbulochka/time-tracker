@@ -42,7 +42,7 @@ func NewUseCase(
         log: log,
         userSaver: userSaver,
         userDeleter: userDeleter,
-        userGetter: userGetter
+        userGetter: userGetter,
         dataEnrichment: dataEnrichment,
         taskManager: taskManager,
     }
