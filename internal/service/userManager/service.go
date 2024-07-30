@@ -3,10 +3,11 @@ package usermanager
 import (
 	"context"
 	"log/slog"
+	"time-tracker/internal/entity"
 )
 
 type UserSaver interface {
-	// CreateUser(...) ...
+	AddUser(context.Context, entity.User) error
 	// UpdateUser(...) ...
 }
 
