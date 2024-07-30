@@ -5,9 +5,9 @@ type UIDRequest struct {
 }
 
 type User struct {
-	PasspotNumber string `validate:"number,required"`
-	Surname       string `validate:"alpha,required" json:"surname"`
-	Name          string `validate:"alpha,required" json:"name"`
-	Patronymic    string `validate:"alpha,required" json:"patronymic"`
-	Adress        string `validate:"required" json:"adress"`
+	PasspotNumber string `json:"passport" validate:"number,required"`
+	Surname       string `json:"surname" validate:"alpha"`
+	Name          string `json:"name" validate:"alpha"`
+	Patronymic    string `json:"patronymic" validate:"alpha"`
+	Adress        string `json:"adress"`
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"time-tracker/internal/adapter/storage"
+	"time-tracker/internal/entity"
 	"time-tracker/internal/lib/logger/sl"
 
 	_ "github.com/lib/pq" // init postgresql driver
@@ -35,6 +36,7 @@ func New(log *slog.Logger, databaseURL string) (*Storage, error) {
 }
 
 func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
+	const op = "postgres.DeleteUser"
 	var exists bool
 	err := s.db.QueryRowContext(
 		ctx,
@@ -42,7 +44,7 @@ func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
 		uid,
 	).Scan(&exists)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	if !exists {
@@ -55,7 +57,34 @@ func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
 		uid,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) AddUser(ctx context.Context, user entity.User) error {
+	const op = "postgres.AddUser"
+
+	stmt, err := s.db.Prepare(`
+	INSERT INTO users(
+	    passport_number,
+		surname,
+		name,
+		patronymic,
+		adress)
+	VALUES($1, $2, $3, $4, $5)
+	`)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx,
+		user.PasspotNumber, user.Surname, user.Name, user.Patronymic, user.Adress,
+	)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil
