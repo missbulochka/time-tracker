@@ -1,6 +1,9 @@
 package usecase
 
-import "context"
+import (
+	"context"
+	"time-tracker/internal/lib/logger/sl"
+)
 
 func (uc *UseCase) DeleteUser(ctx context.Context, uid uint32) error {
 	const op = "usecase.DeleteUser"
@@ -8,7 +11,7 @@ func (uc *UseCase) DeleteUser(ctx context.Context, uid uint32) error {
 
 	uc.log.Info("deleting user")
 	if err := uc.userDeleter.DeleteUser(ctx, uid); err != nil {
-		uc.log.Info("user deletion failed")
+		uc.log.Error("user deletion failed", sl.Err(err))
 		return err
 	}
 
