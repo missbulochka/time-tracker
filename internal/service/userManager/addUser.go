@@ -6,7 +6,7 @@ import (
 	"time-tracker/internal/lib/logger/sl"
 )
 
-func (um *UserManager) AddUser(ctx context.Context, user entity.User) error {
+func (um *UserManager) AddUser(ctx context.Context, user *entity.User) error {
 	const op = "usermanager.CreateUser"
 	um.log.With("op", op)
 

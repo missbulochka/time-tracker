@@ -7,7 +7,7 @@ import (
 )
 
 type UserSaver interface {
-	AddUser(context.Context, entity.User) error
+	AddUser(context.Context, *entity.User) error
 	// UpdateUser(...) ...
 }
 
