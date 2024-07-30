@@ -1,11 +1,11 @@
 package app
 
 import (
-	"fmt"
 	"log/slog"
 	"time-tracker/internal/adapter/storage/postgres"
 	"time-tracker/internal/config"
 	httpapp "time-tracker/internal/handler/http"
+	"time-tracker/internal/usecase"
 )
 
 type App struct {
@@ -13,6 +13,7 @@ type App struct {
 	HTTPSrv         *httpapp.Server
 	psqlDatabaseURL string
 	psqlDB          *postgres.Storage
+	useCase         *usecase.UseCase
 }
 
 func New(
@@ -25,19 +26,29 @@ func New(
 		panic(err)
 	}
 
+	userManagerServ := setupServices(log, psqlStorage)
+
+	appUseCase := usecase.NewUseCase(
+		log,
+		userManagerServ,
+		userManagerServ,
+		// TODO: change structs
+		userManagerServ,
+		userManagerServ,
+		userManagerServ,
+	)
+
 	httpapp := httpapp.New(
 		log,
 		cfg.HTTPcfg.HTTPServer,
 		cfg.HTTPcfg.HTTPPort,
 	)
 
-	// TODO: remove it
-	fmt.Println(psqlStorage)
-
 	return &App{
 		log:             log,
 		HTTPSrv:         httpapp,
 		psqlDatabaseURL: psqlDatabaseURL,
 		psqlDB:          psqlStorage,
+		useCase:         appUseCase,
 	}
 }

@@ -14,7 +14,7 @@ func (a *App) MustRunHTTPServer() {
 
 func (a *App) setupServer() {
 	router := httpapp.NewRouter()
-	router.WithMiddlewares().WithMethods()
+	router.WithMiddlewares().AddRoutes(a.log, a.useCase)
 
-	a.HTTPSrv.RegisterRouts(router.Router)
+	a.HTTPSrv.RegisterRouts(router.GetRouter())
 }
