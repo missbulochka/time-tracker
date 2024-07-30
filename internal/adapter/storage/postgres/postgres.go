@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"time-tracker/internal/adapter/storage"
 	"time-tracker/internal/lib/logger/sl"
 
 	_ "github.com/lib/pq" // init postgresql driver
@@ -34,11 +35,28 @@ func New(log *slog.Logger, databaseURL string) (*Storage, error) {
 }
 
 func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
-	row := s.db.QueryRowContext(
+	var exists bool
+	err := s.db.QueryRowContext(
+		ctx,
+		"SELECT EXISTS(SELECT 1 FROM users WHERE user_id=$1)",
+		uid,
+	).Scan(&exists)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return storage.ErrUserNotFound
+	}
+
+	_, err = s.db.ExecContext(
 		ctx,
 		"DELETE FROM users WHERE user_id=$1",
 		uid,
 	)
-	
-	return row.Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

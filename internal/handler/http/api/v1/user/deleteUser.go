@@ -2,8 +2,10 @@ package userv1
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
+	"time-tracker/internal/adapter/storage"
 	"time-tracker/internal/entity"
 	"time-tracker/internal/entity/validator"
 	"time-tracker/internal/handler/http/api/v1/models"
@@ -46,6 +48,13 @@ func NewDeleteHandler(log *slog.Logger, userDeleter UserDeleter) http.HandlerFun
 		}
 
 		err := userDeleter.DeleteUser(context.Background(), req.UID)
+		if errors.Is(err, storage.ErrUserNotFound) {
+			log.Info("user does not exist", slog.Any("UID", req.UID))
+
+			render.JSON(w, r, resp.Error("user does not exist"))
+
+			return
+		}
 		if err != nil {
 			render.JSON(w, r, resp.Error("failed to delete user"))
 
