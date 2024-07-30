@@ -9,12 +9,12 @@ import (
 func (ui *UserInfo) GetUserInfo(
 	ctx context.Context,
 	passportSerie, passportNumber int32,
-) (*entity.User, error) {
+) (*entity.UserInfo, error) {
 	const op = "dataenrichment.GetUserInfo"
 	ui.log.With("op", op)
 
 	ui.log.Debug("getting userinfo")
-	user, err := ui.dataGetter.GetByID(
+	user, err := ui.dataGetter.GetByPassport(
 		ctx,
 		passportSerie,
 		passportNumber,

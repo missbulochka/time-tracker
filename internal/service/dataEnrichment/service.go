@@ -7,7 +7,7 @@ import (
 )
 
 type DataGetter interface {
-	GetByID(context.Context, int32, int32) (*entity.User, error)
+	GetByPassport(context.Context, int32, int32) (*entity.UserInfo, error)
 }
 
 type UserInfo struct {
