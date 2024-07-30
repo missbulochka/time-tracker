@@ -28,7 +28,7 @@ func NewDeleteHandler(log *slog.Logger, userDeleter UserDeleter) http.HandlerFun
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		var req entity.UIDRequest
+		var req entity.UID
 		if err := render.DecodeJSON(r.Body, &req); err != nil {
 			log.Error("failed to decode request body", sl.Err(err))
 
