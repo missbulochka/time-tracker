@@ -37,21 +37,14 @@ func New(log *slog.Logger, databaseURL string) (*Storage, error) {
 
 func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
 	const op = "postgres.DeleteUser"
-	var exists bool
-	err := s.db.QueryRowContext(
-		ctx,
-		"SELECT EXISTS(SELECT 1 FROM users WHERE user_id=$1)",
-		uid,
-	).Scan(&exists)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+
+	if _, err := s.GetUser(ctx, uid); err != nil {
+		if err == storage.ErrUserNotFound {
+			return err
+		}
 	}
 
-	if !exists {
-		return storage.ErrUserNotFound
-	}
-
-	_, err = s.db.ExecContext(
+	_, err := s.db.ExecContext(
 		ctx,
 		"DELETE FROM users WHERE user_id=$1",
 		uid,
@@ -65,8 +58,7 @@ func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
 
 func (s *Storage) AddUser(
 	ctx context.Context,
-	psrt entity.Passport,
-	user entity.User,
+	user *entity.User,
 ) error {
 	const op = "postgres.AddUser"
 
@@ -84,12 +76,48 @@ func (s *Storage) AddUser(
 	}
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx,
-		psrt.PasspotNumber, user.Surname, user.Name, user.Patronymic, user.Adress,
+	_, err = stmt.ExecContext(
+		ctx,
+		user.Passport.PasspotNumber,
+		user.Info.Surname,
+		user.Info.Name,
+		user.Info.Patronymic,
+		user.Info.Adress,
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil
+}
+
+func (s *Storage) GetUser(ctx context.Context, uid uint32) (*entity.User, error) {
+	const op = "postgres.GetUser"
+
+	var user entity.User
+	err := s.db.QueryRowContext(
+		ctx,
+		`SELECT (
+		    passport_number,
+			surname,
+			name,
+			patronymic,
+			adress,
+		) FROM users WHERE user_id=$1`,
+		uid,
+	).Scan(&user.Passport.PasspotNumber,
+		&user.Info.Surname,
+		&user.Info.Name,
+		&user.Info.Patronymic,
+		&user.Info.Adress,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if len(user.Passport.PasspotNumber) == 0 {
+		return nil, storage.ErrUserNotFound
+	}
+
+	return &user, nil
 }
