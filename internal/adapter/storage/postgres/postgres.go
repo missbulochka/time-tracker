@@ -63,7 +63,11 @@ func (s *Storage) DeleteUser(ctx context.Context, uid uint32) error {
 	return nil
 }
 
-func (s *Storage) AddUser(ctx context.Context, user entity.User) error {
+func (s *Storage) AddUser(
+	ctx context.Context,
+	psrt entity.Passport,
+	user entity.User,
+) error {
 	const op = "postgres.AddUser"
 
 	stmt, err := s.db.Prepare(`
@@ -81,7 +85,7 @@ func (s *Storage) AddUser(ctx context.Context, user entity.User) error {
 	defer stmt.Close()
 
 	_, err = stmt.ExecContext(ctx,
-		user.PasspotNumber, user.Surname, user.Name, user.Patronymic, user.Adress,
+		psrt.PasspotNumber, user.Surname, user.Name, user.Patronymic, user.Adress,
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
