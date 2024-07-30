@@ -7,6 +7,7 @@ type Config struct {
 	MigrationPATH string `envconfig:"TTRACKER_MIGRATIONS_PATH" default:"./migrations"`
 	HTTPcfg       HTTPConfig
 	PSQLcfg       PSQLConfig
+	ExtAPI        ExternalAPI
 }
 
 type HTTPConfig struct {
@@ -20,6 +21,10 @@ type PSQLConfig struct {
 	Host     string `envconfig:"TTRACKER_DB_HOST" default:"time-tracker-psql"`
 	Port     string `envconfig:"TTRACKER_DB_PORT" default:"5432"`
 	DBName   string `envconfig:"TTRACKER_DB_NAME" default:"Tracking"`
+}
+
+type ExternalAPI struct {
+	UserInfoAPI string `envconfig:"TTRACKER_USERINFO_API" default:"https://editor.swagger.io"`
 }
 
 func LoadCfg() (*Config, error) {
