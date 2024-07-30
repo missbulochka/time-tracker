@@ -2,6 +2,7 @@ package app
 
 import (
 	"log/slog"
+	"time-tracker/internal/adapter/api/userinfo"
 	"time-tracker/internal/adapter/storage/postgres"
 	"time-tracker/internal/config"
 	httpapp "time-tracker/internal/handler/http"
@@ -26,7 +27,10 @@ func New(
 		panic(err)
 	}
 
-	userManagerServ := setupServices(log, psqlStorage)
+	userInfoAPI := userinfo.NewRepository(cfg.ExtAPI.UserInfoAPI)
+
+	userManagerServ,
+		dataEnrichmentServ := setupServices(log, psqlStorage, userInfoAPI)
 
 	appUseCase := usecase.NewUseCase(
 		log,
@@ -34,7 +38,7 @@ func New(
 		userManagerServ,
 		// TODO: change structs
 		userManagerServ,
-		userManagerServ,
+		dataEnrichmentServ,
 		userManagerServ,
 	)
 

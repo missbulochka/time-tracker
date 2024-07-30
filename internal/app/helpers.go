@@ -3,8 +3,10 @@ package app
 import (
 	"fmt"
 	"log/slog"
+	"time-tracker/internal/adapter/api/userinfo"
 	"time-tracker/internal/adapter/storage/postgres"
 	"time-tracker/internal/config"
+	dataenrichment "time-tracker/internal/service/dataEnrichment"
 	usermanager "time-tracker/internal/service/userManager"
 )
 
@@ -21,10 +23,18 @@ func getStorageURL(PSQLcfg config.PSQLConfig) string {
 func setupServices(
 	log *slog.Logger,
 	psqlStorage *postgres.Storage,
-) *usermanager.UserManager {
-    return usermanager.NewService(
-		log,
-		psqlStorage,
-		psqlStorage,
-	)
+	userInfoAPI *userinfo.Repository,
+) (
+	*usermanager.UserManager,
+	*dataenrichment.UserInfo,
+) {
+	return usermanager.NewService(
+			log,
+			psqlStorage,
+			psqlStorage,
+		),
+		dataenrichment.NewService(
+			log,
+			userInfoAPI,
+		)
 }
